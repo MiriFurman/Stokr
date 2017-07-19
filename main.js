@@ -2,6 +2,9 @@
  * Created by mirif on 18/07/2017.
  */
 
+//TODO - create app model object - what is the view made of
+  // TODO - 19/07/2017 -  data-symbol, data-direction instead of className
+
 let stocksOrder = [
   "WIX",
   "MSFT",
@@ -33,41 +36,41 @@ let Stocks = [
 ];
 
 
-const states = {
-  DAILY_CHANGE : true,
-  MARKET_CAPITAL : false
+const VIEW_STATES = {
+  DAILY_CHANGE : 'DAILY_CHANGE',
+  MARKET_CAPITAL : 'MARKET_CAPITAL'
 };
 
-let currState = states.DAILY_CHANGE;
+let stocksViewState;
 
 function init() {
-  currState = states.DAILY_CHANGE;
-  initStocksList();
+  stocksViewState = VIEW_STATES.DAILY_CHANGE;
+  initStockContainer();
 }
 
-function handleClick(e) {
+function handleClickOnStockListContainer(e) {
 
   if (e.target.className.includes('stock-data-btn')) {
-    currState = !currState;
+    stocksViewState = stocksViewState === VIEW_STATES.DAILY_CHANGE ? VIEW_STATES.MARKET_CAPITAL : VIEW_STATES.DAILY_CHANGE;
     initStocksList();
   }
 
   if (e.target.className.includes('nav-btn')) {
-    let currLoacation = stocksOrder.indexOf(e.target.parentNode.id);
-    let newLocation = currLoacation + 1;
-    if (e.target.className.includes('btn-up')) {
-      newLocation = currLoacation - 1;
-    }
-    stocksOrderChange(currLoacation, newLocation);
+    const currLocation = stocksOrder.indexOf(e.target.parentNode.dataset.id);
+    const shouldStockMoveUp = e.target.className.includes('btn-up');
+    const newLocation = shouldStockMoveUp ? currLocation - 1 : currLocation + 1;
+    stocksOrderChange(currLocation, newLocation);
     initStocksList();
   }
 
 }
 
 function stocksOrderChange(currLoc, newLoc) {
-  let temp = stocksOrder[newLoc];
-  stocksOrder[newLoc] = stocksOrder[currLoc];
-  stocksOrder[currLoc] = temp;
+  if (newLoc > 0 && newLoc < stocksOrder.length) {
+    const temp = stocksOrder[newLoc];
+    stocksOrder[newLoc] = stocksOrder[currLoc];
+    stocksOrder[currLoc] = temp;
+  }
 }
 
 function addStocksByOrder() {
@@ -81,24 +84,27 @@ function addStocksByOrder() {
   return stockListHtml;
 }
 
+function initStockContainer() {
+  const stocksListWrapperDiv = document.querySelector('.stocks-list-wrapper');
+  stocksListWrapperDiv.addEventListener('click', handleClickOnStockListContainer);
+  initStocksList();
+}
 function initStocksList() {
   const stocksListWrapperDiv = document.querySelector('.stocks-list-wrapper');
   // stocksListWrapperDiv.innerHTML = '<ul class="stocks-list">' + Stocks.map(renderStock).join('') + '</ul>';
   stocksListWrapperDiv.innerHTML = '<ul class="stocks-list">' + addStocksByOrder() + '</ul>';
-  stocksListWrapperDiv.removeEventListener('click', handleClick);
-  stocksListWrapperDiv.addEventListener('click', handleClick);
   disableButtons();
 }
 
 function renderStock(stock) {
   let btnClass = parseFloat(stock.PercentChange) > 0 ? 'btn-green' : 'btn-red';
-  let btnData = currState === states.DAILY_CHANGE ? stock.PercentChange : parseFloat(stock.Change).toFixed(2);
+  let btnData = stocksViewState === VIEW_STATES.DAILY_CHANGE ? stock.PercentChange : parseFloat(stock.Change).toFixed(2);
   return `<li class="stock" data-id="${stock.Symbol}">
     <span class="stock-name">${stock.Symbol} (${stock.Name})</span>
     <div class="stock-data">
       <span>${parseFloat(stock.LastTradePriceOnly).toFixed(2)}</span>
       <button class="main-btn stock-data-btn ${btnClass}">${btnData}</button>
-      <div class="up-down-wrapper" id="${stock.Symbol}">
+      <div class="up-down-wrapper" data-id="${stock.Symbol}">
         <button class="nav-btn btn-up"></button>
         <button class="nav-btn btn-down"></button>
       </div>
