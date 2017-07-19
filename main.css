@@ -174,3 +174,14 @@ header h1 {
   background: url('assets/svg/arrow.svg') no-repeat bottom right;
   background-size: cover;
 }
+
+.nav-btn:disabled {
+  filter: brightness(130%);
+  cursor: default;
+}
+
+/*.stock:first-of-type .btn-up,*/
+/*.stock:last-of-type .btn-down {*/
+  /*filter: brightness(130%);*/
+  /*cursor: default;*/
+/*}*/

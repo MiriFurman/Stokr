@@ -2,8 +2,13 @@
  * Created by mirif on 18/07/2017.
  */
 
+let stocksOrder = [
+  "WIX",
+  "MSFT",
+  "YHOO"
+];
 
-const Stocks = [
+let Stocks = [
   {
     "Symbol": "WIX",
     "Name": "Wix.com Ltd.",
@@ -41,17 +46,48 @@ function init() {
 }
 
 function handleClick(e) {
+
   if (e.target.className.includes('stock-data-btn')) {
     currState = !currState;
     initStocksList();
   }
+
+  if (e.target.className.includes('nav-btn')) {
+    let currLoacation = stocksOrder.indexOf(e.target.parentNode.id);
+    let newLocation = currLoacation + 1;
+    if (e.target.className.includes('btn-up')) {
+      newLocation = currLoacation - 1;
+    }
+    stocksOrderChange(currLoacation, newLocation);
+    initStocksList();
+  }
+
+}
+
+function stocksOrderChange(currLoc, newLoc) {
+  let temp = stocksOrder[newLoc];
+  stocksOrder[newLoc] = stocksOrder[currLoc];
+  stocksOrder[currLoc] = temp;
+}
+
+function addStocksByOrder() {
+  let stockListHtml = '';
+  stocksOrder.forEach((stockSymbol) => {
+    let currStock = Stocks.find((stock) => {
+      return stock.Symbol === stockSymbol;
+    });
+    stockListHtml += renderStock(currStock);
+  });
+  return stockListHtml;
 }
 
 function initStocksList() {
   const stocksListWrapperDiv = document.querySelector('.stocks-list-wrapper');
-  stocksListWrapperDiv.innerHTML = '<ul class="stocks-list">' + Stocks.map(renderStock).join('') + '</ul>';
+  // stocksListWrapperDiv.innerHTML = '<ul class="stocks-list">' + Stocks.map(renderStock).join('') + '</ul>';
+  stocksListWrapperDiv.innerHTML = '<ul class="stocks-list">' + addStocksByOrder() + '</ul>';
   stocksListWrapperDiv.removeEventListener('click', handleClick);
   stocksListWrapperDiv.addEventListener('click', handleClick);
+  disableButtons();
 }
 
 function renderStock(stock) {
@@ -62,12 +98,17 @@ function renderStock(stock) {
     <div class="stock-data">
       <span>${parseFloat(stock.LastTradePriceOnly).toFixed(2)}</span>
       <button class="main-btn stock-data-btn ${btnClass}">${btnData}</button>
-      <div class="up-down-wrapper">
+      <div class="up-down-wrapper" id="${stock.Symbol}">
         <button class="nav-btn btn-up"></button>
         <button class="nav-btn btn-down"></button>
       </div>
     </div>
   </li>`
+}
+
+function disableButtons() {
+  document.querySelector('.stock:first-child .btn-up').disabled = true;
+  document.querySelector('.stock:last-child .btn-down').disabled = true;
 }
 
 init();
