@@ -3,7 +3,6 @@
  */
 
 //TODO - create app model object - what is the view made of
-  // TODO - 19/07/2017 -  data-symbol, data-direction instead of className
 
 let stocksOrder = [
   "WIX",
@@ -50,14 +49,14 @@ function init() {
 
 function handleClickOnStockListContainer(e) {
 
-  if (e.target.className.includes('stock-data-btn')) {
+  if (e.target.dataset.id === 'stock-data-btn') {
     stocksViewState = stocksViewState === VIEW_STATES.DAILY_CHANGE ? VIEW_STATES.MARKET_CAPITAL : VIEW_STATES.DAILY_CHANGE;
     initStocksList();
   }
 
-  if (e.target.className.includes('nav-btn')) {
-    const currLocation = stocksOrder.indexOf(e.target.parentNode.dataset.id);
-    const shouldStockMoveUp = e.target.className.includes('btn-up');
+  if (e.target.dataset.id === 'nav-btn') {
+    const currLocation = stocksOrder.indexOf(e.target.parentNode.dataset.symbol);
+    const shouldStockMoveUp = e.target.dataset.direction === 'up' ? 1 : 0;
     const newLocation = shouldStockMoveUp ? currLocation - 1 : currLocation + 1;
     stocksOrderChange(currLocation, newLocation);
     initStocksList();
@@ -66,7 +65,7 @@ function handleClickOnStockListContainer(e) {
 }
 
 function stocksOrderChange(currLoc, newLoc) {
-  if (newLoc > 0 && newLoc < stocksOrder.length) {
+  if (newLoc >= 0 && newLoc < stocksOrder.length) {
     const temp = stocksOrder[newLoc];
     stocksOrder[newLoc] = stocksOrder[currLoc];
     stocksOrder[currLoc] = temp;
@@ -91,7 +90,6 @@ function initStockContainer() {
 }
 function initStocksList() {
   const stocksListWrapperDiv = document.querySelector('.stocks-list-wrapper');
-  // stocksListWrapperDiv.innerHTML = '<ul class="stocks-list">' + Stocks.map(renderStock).join('') + '</ul>';
   stocksListWrapperDiv.innerHTML = '<ul class="stocks-list">' + addStocksByOrder() + '</ul>';
   disableButtons();
 }
@@ -99,14 +97,14 @@ function initStocksList() {
 function renderStock(stock) {
   let btnClass = parseFloat(stock.PercentChange) > 0 ? 'btn-green' : 'btn-red';
   let btnData = stocksViewState === VIEW_STATES.DAILY_CHANGE ? stock.PercentChange : parseFloat(stock.Change).toFixed(2);
-  return `<li class="stock" data-id="${stock.Symbol}">
+  return `<li class="stock" data-symbol="${stock.Symbol}">
     <span class="stock-name">${stock.Symbol} (${stock.Name})</span>
     <div class="stock-data">
       <span>${parseFloat(stock.LastTradePriceOnly).toFixed(2)}</span>
-      <button class="main-btn stock-data-btn ${btnClass}">${btnData}</button>
-      <div class="up-down-wrapper" data-id="${stock.Symbol}">
-        <button class="nav-btn btn-up"></button>
-        <button class="nav-btn btn-down"></button>
+      <button class="main-btn stock-data-btn ${btnClass}" data-id="stock-data-btn">${btnData}</button>
+      <div class="up-down-wrapper" data-symbol="${stock.Symbol}">
+        <button class="nav-btn btn-up" data-direction="up" data-id="nav-btn"></button>
+        <button class="nav-btn btn-down" data-direction="down" data-id="nav-btn"></button>
       </div>
     </div>
   </li>`
