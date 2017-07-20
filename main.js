@@ -41,10 +41,26 @@ const VIEW_STATES = {
 };
 
 let stocksViewState;
+let filterState;
 
 function init() {
   stocksViewState = VIEW_STATES.DAILY_CHANGE;
+  filterState = VIEW_STATES.HIDE_FILTER;
   initStockContainer();
+  const header = document.querySelector('header');
+  header.addEventListener('click', handleClickOnHeader);
+}
+
+function handleClickOnHeader(e) {
+  if (e.target.dataset.id === 'filter-btn'){
+    const filterSection = document.querySelector('.filter-section');
+    filterSection.style.display = filterSection.style.display === 'none' ? 'block' : 'none';
+    if (filterSection.style.display === 'block') {
+      document.querySelector('.filter-btn').style.color='#41bf15';
+    } else {
+      document.querySelector('.filter-btn').style.color='#ababab';
+    }
+  }
 }
 
 function handleClickOnStockListContainer(e) {
@@ -56,7 +72,7 @@ function handleClickOnStockListContainer(e) {
 
   if (e.target.dataset.id === 'nav-btn') {
     const currLocation = stocksOrder.indexOf(e.target.parentNode.dataset.symbol);
-    const shouldStockMoveUp = e.target.dataset.direction === 'up' ? 1 : 0;
+    const shouldStockMoveUp = e.target.dataset.direction === 'up';
     const newLocation = shouldStockMoveUp ? currLocation - 1 : currLocation + 1;
     stocksOrderChange(currLocation, newLocation);
     initStocksList();
@@ -101,10 +117,10 @@ function renderStock(stock) {
     <span class="stock-name">${stock.Symbol} (${stock.Name})</span>
     <div class="stock-data">
       <span>${parseFloat(stock.LastTradePriceOnly).toFixed(2)}</span>
-      <button class="main-btn stock-data-btn ${btnClass}" data-id="stock-data-btn">${btnData}</button>
+      <button class="stock-data-btn ${btnClass}" data-id="stock-data-btn">${btnData}</button>
       <div class="up-down-wrapper" data-symbol="${stock.Symbol}">
-        <button class="nav-btn btn-up" data-direction="up" data-id="nav-btn"></button>
-        <button class="nav-btn btn-down" data-direction="down" data-id="nav-btn"></button>
+        <button class="nav-btn btn-up icon-arrow" data-direction="up" data-id="nav-btn"></button>
+        <button class="nav-btn btn-down icon-arrow" data-direction="down" data-id="nav-btn"></button>
       </div>
     </div>
   </li>`

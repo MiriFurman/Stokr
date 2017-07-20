@@ -12,12 +12,41 @@
         <header>
           <h1>Stokr</h1>
           <div class="header-btns">
-            <button class="search-btn main-btn"></button>
-            <button class="refresh-btn main-btn"></button>
-            <button class="filter-btn main-btn"></button>
-            <button class="settings-btn main-btn"></button>
+            <button class="search-btn header-btn icon-search" data-id="search-btn"></button>
+            <button class="refresh-btn header-btn icon-refresh" data-id="refresh-btn"></button>
+            <button class="filter-btn header-btn icon-filter" data-id="filter-btn"></button>
+            <button class="settings-btn header-btn icon-settings" data-id="settings-btn"></button>
           </div>
         </header>
+        <section class="filter-section">
+          <form>
+            <div class="filter-form-column first-filter-form-column">
+              <div>
+                <label for="by-name">By Name</label>
+                <input type="text" id="by-name" name="by-name">
+              </div>
+              <div>
+                <label for="by-gain">By Gain</label>
+                <select id="by-gain" name="by-gain">
+                  <option value="All">All</option>
+                  <option value="Losing">Losing</option>
+                  <option value="Gaining">Gaining</option>
+                </select>
+              </div>
+            </div>
+            <div class="filter-form-column second-filter-form-column">
+              <div>
+                <label for="by-range-from">By Range: From</label>
+                <input type="number" step="0.01" id="by-range-from" name="by-range-from">
+              </div>
+              <div>
+                <label for="by-range-to">By Range: To</label>
+                <input type="number" step="0.01" id="by-range-to" name="by-range-to">
+              </div>
+            </div>
+            <button type="submit" class="round-green-btn">Apply</button>
+          </form>
+        </section>
         <div class="stocks-list-wrapper"></div>
       </main>
     </div>

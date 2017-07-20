@@ -24,6 +24,14 @@ body {
   margin: 0;
 }
 
+button {
+  outline: 0;
+  border:none;
+  cursor: pointer;
+  display: inline-block;
+  margin: 5px;
+}
+
 .main-wrapper {
   display: flex;
   align-items: center;
@@ -59,37 +67,28 @@ header h1 {
   margin: 0;
 }
 
-.main-btn {
-  border:none;
-  cursor: pointer;
-  display: inline-block;
-  margin: 5px;
+.header-btn {
+  background: none;
+  font-size: 45px;
+  color: #ababab;
 }
 
 .search-btn {
-  background: url('assets/svg/search.svg') no-repeat top left;
-  background-size: contain;
   width: 40px;
   height: 39px;
 }
 
 .refresh-btn {
-  background: url('assets/svg/refresh.svg') no-repeat top left;
-  background-size: contain;
   width: 41px;
   height: 41px;
 }
 
 .filter-btn {
-  background: url('assets/svg/filter.svg') no-repeat top left;
-  background-size: contain;
   height: 37.1px;
   width: 45px;
 }
 
 .settings-btn {
-  background: url('assets/svg/settings.svg') no-repeat top left;
-  background-size: contain;
   height: 40px;
   width: 40px;
 }
@@ -156,23 +155,17 @@ header h1 {
 }
 
 .nav-btn {
-  border:none;
-  cursor: pointer;
   width: 38px;
   height: 25px;
   padding: 0;
   margin: 0;
-}
-
-.btn-up {
-   background: url('assets/svg/arrow.svg') no-repeat top left;
-   background-size: cover;
-   transform: rotate(180deg);
+  background: none;
+  font-size: 28px;
+  color: #ababab;
 }
 
 .btn-down {
-  background: url('assets/svg/arrow.svg') no-repeat bottom right;
-  background-size: cover;
+  transform: rotate(180deg);
 }
 
 .nav-btn:disabled {
@@ -180,8 +173,58 @@ header h1 {
   cursor: default;
 }
 
-/*.stock:first-of-type .btn-up,*/
-/*.stock:last-of-type .btn-down {*/
-  /*filter: brightness(130%);*/
-  /*cursor: default;*/
-/*}*/
+.filter-section {
+  display: none;
+  padding: 10px 30px;
+  border-top: solid 1px #e5e5e5;
+}
+
+.filter-section form {
+  display: flex;
+  justify-content: space-between;
+  font-family: HelveticaNeueW01-55Roman;
+  font-size: 26px;
+  color: #59737c;
+}
+
+.filter-form-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.first-filter-form-column {
+  width: 38%;
+}
+
+.second-filter-form-column {
+  width: 45%;
+}
+
+.filter-section form input,
+.filter-section form select {
+  width: 332px;
+  height: 55px;
+  border-radius: 10px;
+  background-color: #ffffff;
+  border: solid 1px #e0e0e0;
+  float: right;
+  font-size: 24px;
+}
+
+.filter-section form label {
+  float: left;
+}
+
+.round-green-btn {
+  width: 120px;
+  height: 111px;
+  background-color: #41bf15;
+  border: solid 1px #247906;
+  border-radius: 50%;
+  font-family: HelveticaNeueW01-55Roman;
+  font-size: 30px;
+  font-weight: bold;
+  color: #ffffff;
+  width: 10%;
+}
