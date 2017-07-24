@@ -6,18 +6,47 @@
   'use strict';
   window.Stokr = window.Stokr || {};
 
-  const STOCKS_VIEW_STATES = {
-    DAILY_CHANGE: 'DAILY_CHANGE',
-    MARKET_CAPITAL: 'MARKET_CAPITAL'
-  };
+  const consts = window.Stokr.Constants;
 
-  function addStocksByOrder(stocksData) {
+  function render(state) {
+    renderHeader(state.uiState);
+    renderStockList(state);
+  }
+
+  function renderHeader(uiState) {
+    renderFilter(uiState);
+    renderSettings(uiState);
+    renderSearch(uiState);
+  }
+
+  function renderFilter(uiState) {
+    const filterSection = document.querySelector('.filter-section');
+    if (uiState.isFilterEnabled) {
+      filterSection.style.display = 'block';
+      document.querySelector('.filter-btn').style.color='#41bf15';
+    } else {
+      filterSection.style.display = 'none';
+      document.querySelector('.filter-btn').style.color='#ababab';
+    }
+  }
+
+  function renderSettings(uiState) {}
+
+  function renderSearch(uiState) {}
+
+  function renderStockList(state) {
+    const stocksListWrapperDiv = document.querySelector('.stocks-list-wrapper');
+    stocksListWrapperDiv.innerHTML = '<ul class="stocks-list">' + addStocksByOrder(state) + '</ul>';
+    disableButtons();
+  }
+
+  function addStocksByOrder(state) {
     let stockListHtml = '';
-    stocksData.stocksOrder.forEach((stockSymbol) => {
-      let currStock = stocksData.stocks.find((stock) => {
+    state.stocksOrder.forEach((stockSymbol) => {
+      let currStock = state.stocks.find((stock) => {
         return stock.Symbol === stockSymbol;
       });
-      stockListHtml += renderStock(currStock);
+      stockListHtml += renderStock(currStock, state.uiState);
     });
     return stockListHtml;
   }
@@ -27,21 +56,17 @@
     document.querySelector('.stock:last-child .btn-down').disabled = true;
   }
 
-  function initStocksList(stocksData) {
-    const stocksListWrapperDiv = document.querySelector('.stocks-list-wrapper');
-    stocksListWrapperDiv.innerHTML = '<ul class="stocks-list">' + addStocksByOrder(stocksData) + '</ul>';
-    disableButtons();
-  }
-
-  function renderStock(stock) {
+  function renderStock(stock, uiState) {
     let btnClass = parseFloat(stock.PercentChange) > 0 ? 'btn-green' : 'btn-red';
-    let btnData = window.Stokr.View.stocksViewState === STOCKS_VIEW_STATES.DAILY_CHANGE ? stock.PercentChange : parseFloat(stock.Change).toFixed(2);
+    let btnData = stock[consts.STOCK_VIEW_STATES[uiState.stocksViewState]];
+    btnData = consts.STOCK_VIEW_STATES[uiState.stocksViewState] === 'Change' ? parseFloat(btnData).toFixed(2) : btnData;
+    let upDownDisplay = uiState.isFilterEnabled ? 'none' : 'flex';
     return `<li class="stock" data-symbol="${stock.Symbol}">
             <span class="stock-name">${stock.Symbol} (${stock.Name})</span>
             <div class="stock-data">
               <span>${parseFloat(stock.LastTradePriceOnly).toFixed(2)}</span>
               <button class="stock-data-btn ${btnClass}" data-id="stock-data-btn">${btnData}</button>
-              <div class="up-down-wrapper">
+              <div class="up-down-wrapper" style="display: ${upDownDisplay}">
                 <button class="nav-btn btn-up icon-arrow" data-direction="up" data-id="nav-btn"></button>
                 <button class="nav-btn btn-down icon-arrow" data-direction="down" data-id="nav-btn"></button>
               </div>
@@ -49,17 +74,37 @@
           </li>`
   }
 
-  function addViewEventListener(elem,eventType,callback) {
-    elem.addEventListener(eventType, callback);
+  function setupEventListeners() {
+    const header = document.querySelector('header');
+    header.addEventListener('click', headerClickHandler);
+    const stocksListWrapperDiv = document.querySelector('.stocks-list-wrapper');
+    stocksListWrapperDiv.addEventListener('click', stockListContainerClickHandler);
+  }
+
+  function headerClickHandler(e) {
+    const target = e.target;
+    const Ctrl = window.Stokr.Controller;
+    if (target.dataset.id === 'filter-btn') {
+      Ctrl.toggleFilterAndRender();
+    }
+  }
+
+  function stockListContainerClickHandler(e) {
+    const target = e.target;
+    const Ctrl = window.Stokr.Controller;
+    if (target.dataset.id === 'stock-data-btn') {
+      Ctrl.toggleStocksStateAndRender();
+    }
+    if (target.dataset.id === 'nav-btn') {
+      const currStockSymbol = target.closest('li').dataset.symbol;
+      const shouldMoveUp = target.dataset.direction === 'up';
+      Ctrl.swapStocksOrder(currStockSymbol, shouldMoveUp);
+    }
   }
 
   window.Stokr.View = {
-    stocksViewState: STOCKS_VIEW_STATES.DAILY_CHANGE,
-    initStocksList,
-    addViewEventListener,
-    toggleStocksState : function () {
-      this.stocksViewState = this.stocksViewState === STOCKS_VIEW_STATES.DAILY_CHANGE ? STOCKS_VIEW_STATES.MARKET_CAPITAL : STOCKS_VIEW_STATES.DAILY_CHANGE;
-    }
+    render,
+    setupEventListeners
   }
 
 })();

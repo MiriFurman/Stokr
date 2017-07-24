@@ -6,9 +6,17 @@
   'use strict';
   window.Stokr = window.Stokr || {};
 
+  const consts = window.Stokr.Constants;
+
   window.Stokr.Model = {
 
-    data: {
+    state: {
+
+      uiState: {
+        stocksViewState: 0,
+        isFilterEnabled: false,
+        filters: {}
+      },
 
       stocksOrder: [
         "WIX",
@@ -42,26 +50,35 @@
 
     },
 
-    gatStocksData: function () {
-      return this.data;
+    getState: function () {
+      return this.state;
     },
 
-    getStockOrder: function () {
-      return this.data.stocksOrder;
+    getStocksViewState: function () {
+      return this.state.uiState.stocksViewState;
     },
 
-    getStocks: function () {
-      return this.data.stocks;
+    setStocksViewState: function (state) {
+      this.state.uiState.stocksViewState = state;
     },
 
-    // swapStocksOrder: function (currLoc, newLoc) {
-    //   if (newLoc >= 0 && newLoc < this.data.stocksOrder.length) {
-    //     const temp = this.data.stocksOrder[newLoc];
-    //     this.data.stocksOrder[newLoc] = this.data.stocksOrder[currLoc];
-    //     this.data.stocksOrder[currLoc] = temp;
-    //   }
-    //
-    // }
+    getFilterEnabled: function () {
+      return this.state.uiState.isFilterEnabled;
+    },
+
+    setFilterEnabled: function (isEnabled) {
+      this.state.uiState.isFilterEnabled = isEnabled;
+    },
+
+    getStocksOrder: function () {
+      return this.state.stocksOrder;
+    },
+
+    setStocksOrder: function (stocksOrder) {
+      this.state.stocksOrder = stocksOrder;
+    }
+
+
   }
 
 })();

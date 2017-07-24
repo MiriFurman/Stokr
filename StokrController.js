@@ -6,72 +6,43 @@
   'use strict';
   window.Stokr = window.Stokr || {};
 
+  const consts = window.Stokr.Constants;
   const model = window.Stokr.Model;
   const view = window.Stokr.View;
 
   function init() {
-    initStockContainer();
-    const header = document.querySelector('header');
-    view.addViewEventListener(header, 'click', headerClickHandler);
+    view.render(model.getState());
+    view.setupEventListeners();
   }
 
-  function initStockContainer() {
-    const stocksListWrapperDiv = document.querySelector('.stocks-list-wrapper');
-    view.addViewEventListener(stocksListWrapperDiv, 'click', stockListContainerClickHandler);
-    view.initStocksList(model.gatStocksData());
+  function toggleStocksStateAndRender() {
+    model.setStocksViewState(model.getStocksViewState() === consts.STOCK_VIEW_STATES.length -1 ? 0 : model.getStocksViewState() + 1);
+    view.render(model.getState());
   }
 
-  function headerClickHandler(e) {
-    const target = e.target;
-    if (target.dataset.id === 'filter-btn') {
-      const filterSection = document.querySelector('.filter-section');
-      const upDownWrapperAll = document.querySelectorAll('.up-down-wrapper');
-      filterSection.style.display = filterSection.style.display === 'none' ? 'block' : 'none';
-
-      if (filterSection.style.display === 'block') {
-        document.querySelector('.filter-btn').style.color = '#41bf15';
-
-        [].forEach.call(upDownWrapperAll, function (upDownWrapper) {
-          upDownWrapper.style.display = 'none';
-        });
-      } else {
-        document.querySelector('.filter-btn').style.color = '#ababab';
-
-        [].forEach.call(upDownWrapperAll, function (upDownWrapper) {
-          upDownWrapper.style.display = 'flex';
-        });
-        view.initStocksList(model.gatStocksData());
-      }
-    }
+  function toggleFilterAndRender() {
+    model.setFilterEnabled(!model.getFilterEnabled());
+    view.render(model.getState());
   }
 
-  function stockListContainerClickHandler(e) {
-    const target = e.target;
-    if (target.dataset.id === 'stock-data-btn') {
-      view.toggleStocksState();
-      view.initStocksList(model.gatStocksData());
+  function swapStocksOrder(currStockSymbol, shouldMoveUp) {
+    const stocksOrder = model.getStocksOrder();
+    const currLocation = stocksOrder.indexOf(currStockSymbol);
+    const newLocation = shouldMoveUp ? currLocation - 1 : currLocation + 1;
+    if (newLocation >= 0 && newLocation < stocksOrder.length) {
+      const temp = stocksOrder[newLocation];
+      stocksOrder[newLocation] = stocksOrder[currLocation];
+      stocksOrder[currLocation] = temp;
     }
-    if (target.dataset.id === 'nav-btn') {
-      const currLocation = model.getStockOrder().indexOf(target.closest('li').dataset.symbol);
-      const shouldStockMoveUp = target.dataset.direction === 'up';
-      const newLocation = shouldStockMoveUp ? currLocation - 1 : currLocation + 1;
-      swapStocksOrder(currLocation, newLocation);
-      view.initStocksList(model.gatStocksData());
-    }
-  }
-
-  function swapStocksOrder(currLoc, newLoc) {
-    if (newLoc >= 0 && newLoc < model.stocksOrder.length) {
-      const temp = model.stocksOrder[newLoc];
-      model.stocksOrder[newLoc] = model.stocksOrder[currLoc];
-      model.stocksOrder[currLoc] = temp;
-    }
-
+    model.setStocksOrder(stocksOrder);
+    view.render(model.getState());
   }
 
   window.Stokr.Controller = {
     init,
-    swapStocksOrder
+    swapStocksOrder,
+    toggleStocksStateAndRender,
+    toggleFilterAndRender
   };
 
 

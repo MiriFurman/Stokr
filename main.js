@@ -91,7 +91,7 @@
   function stockListContainerClickHandler(e) {
     const target = e.target;
 
-    if (target.dataset.id === 'stock-data-btn') {
+    if (target.dataset.id === 'stock-state-btn') {
       stocksViewState = stocksViewState === STOCKS_VIEW_STATES.DAILY_CHANGE ? STOCKS_VIEW_STATES.MARKET_CAPITAL : STOCKS_VIEW_STATES.DAILY_CHANGE;
       initStocksList();
     }
