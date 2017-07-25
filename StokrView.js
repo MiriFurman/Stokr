@@ -8,9 +8,9 @@
 
   const consts = window.Stokr.Constants;
 
-  function render(state) {
-    renderHeader(state.uiState);
-    renderStockList(state);
+  function render(uiState, stocks) {
+    renderHeader(uiState);
+    renderStockList(uiState,stocks);
   }
 
   function renderHeader(uiState) {
@@ -34,26 +34,20 @@
 
   function renderSearch(uiState) {}
 
-  function renderStockList(state) {
+  function renderStockList(uiState, stocks) {
     const stocksListWrapperDiv = document.querySelector('.stocks-list-wrapper');
-    stocksListWrapperDiv.innerHTML = '<ul class="stocks-list">' + addStocksByOrder(state) + '</ul>';
+    stocksListWrapperDiv.innerHTML = '<ul class="stocks-list">' + stocks.map((stock) => renderStock(stock,uiState)).join('') + '</ul>';
     disableButtons();
   }
 
-  function addStocksByOrder(state) {
-    let stockListHtml = '';
-    state.stocksOrder.forEach((stockSymbol) => {
-      let currStock = state.stocks.find((stock) => {
-        return stock.Symbol === stockSymbol;
-      });
-      stockListHtml += renderStock(currStock, state.uiState);
-    });
-    return stockListHtml;
-  }
 
   function disableButtons() {
-    document.querySelector('.stock:first-child .btn-up').disabled = true;
-    document.querySelector('.stock:last-child .btn-down').disabled = true;
+    if (document.querySelector('.stock:first-child .btn-up')) {
+      document.querySelector('.stock:first-child .btn-up').disabled = true;
+    }
+    if (document.querySelector('.stock:last-child .btn-down')) {
+      document.querySelector('.stock:last-child .btn-down').disabled = true;
+    }
   }
 
   function renderStock(stock, uiState) {
@@ -77,8 +71,8 @@
   function setupEventListeners() {
     const header = document.querySelector('header');
     header.addEventListener('click', headerClickHandler);
-    const filterApply = document.querySelector('.filter-section form button');
-    filterApply.addEventListener('click', applyFilters);
+    const filterForm = document.querySelector('#filter-form');
+    filterForm.addEventListener('submit', filterSubmitHandler);
     const stocksListWrapperDiv = document.querySelector('.stocks-list-wrapper');
     stocksListWrapperDiv.addEventListener('click', stockListContainerClickHandler);
   }
@@ -94,9 +88,11 @@
   function stockListContainerClickHandler(e) {
     const target = e.target;
     const Ctrl = window.Stokr.Controller;
+
     if (target.dataset.id === 'stock-data-btn') {
       Ctrl.toggleStocksStateAndRender();
     }
+
     if (target.dataset.id === 'nav-btn') {
       const currStockSymbol = target.closest('li').dataset.symbol;
       const shouldMoveUp = target.dataset.direction === 'up';
@@ -104,9 +100,20 @@
     }
   }
 
-  function applyFilters(e) {
-    const target = e.target;
+  function filterSubmitHandler(e) {
+    e.preventDefault();
+
     const Ctrl = window.Stokr.Controller;
+    const formInputs = e.target.elements;
+
+    const filter = {
+      name: formInputs.stockName.value,
+      gain: formInputs.stockGain.value,
+      range_from: formInputs.rangeFrom.value,
+      range_to: formInputs.rangeTo.value
+    };
+
+    Ctrl.setFilterAndRender(filter);
   }
 
   window.Stokr.View = {

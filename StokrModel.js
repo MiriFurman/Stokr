@@ -10,47 +10,24 @@
 
   window.Stokr.Model = {
 
-    state: {},
+    state: {
 
-    // state: {
-    //
-    //   uiState: {
-    //     stocksViewState: 0,
-    //     isFilterEnabled: false,
-    //     filters: {}
-    //   },
-    //
-    //   stocksOrder: [
-    //     "WIX",
-    //     "MSFT",
-    //     "YHOO"
-    //   ],
-    //
-    //   stocks: [
-    //     {
-    //       "Symbol": "WIX",
-    //       "Name": "Wix.com Ltd.",
-    //       "Change": "0.750000",
-    //       "PercentChange": "+1.51%",
-    //       "LastTradePriceOnly": "76.099998"
-    //     },
-    //     {
-    //       "Symbol": "MSFT",
-    //       "Name": "Microsoft Corporation",
-    //       "PercentChange": "-2.09%",
-    //       "Change": "-0.850006",
-    //       "LastTradePriceOnly": "69.620003"
-    //     },
-    //     {
-    //       "Symbol": "YHOO",
-    //       "Name": "Yahoo! Inc.",
-    //       "Change": "0.279999",
-    //       "PercentChange": "+1.11%",
-    //       "LastTradePriceOnly": "50.599998"
-    //     }
-    //   ]
-    //
-    // },
+      uiState: {
+        stocksViewState: 0,
+        isFilterEnabled: false,
+        filters: {}
+      },
+
+      stocksOrder: [
+        "WIX",
+        "MSFT",
+        "YHOO"
+      ],
+
+      stocks: {}
+
+    },
+
 
     getState: function () {
       return this.state;
@@ -58,6 +35,14 @@
 
     setState: function (state) {
       this.state = state;
+    },
+
+    getUiState: function () {
+      return this.state.uiState;
+    },
+
+    setUiState: function (uiState) {
+      this.state.uiState = uiState;
     },
 
     getStocksViewState: function () {
@@ -76,12 +61,28 @@
       this.state.uiState.isFilterEnabled = isEnabled;
     },
 
+    getFilters: function () {
+      return this.state.uiState.filters;
+    },
+
+    setfilters: function (filters) {
+      this.state.uiState.filters = filters;
+    },
+
     getStocksOrder: function () {
       return this.state.stocksOrder;
     },
 
     setStocksOrder: function (stocksOrder) {
       this.state.stocksOrder = stocksOrder;
+    },
+
+    getStocks: function () {
+      return this.state.stocks;
+    },
+
+    setStocks: function(stocks) {
+      this.state.stocks = stocks;
     }
 
 

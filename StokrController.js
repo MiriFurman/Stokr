@@ -10,34 +10,58 @@
   const model = window.Stokr.Model;
   const view = window.Stokr.View;
 
+  function renderView() {
+    let stocks = model.getStocks();
+
+    if (model.getFilterEnabled()) {
+      const filter = model.getFilters();
+      const checkName = stock => (!filter.name || stock.Name.toLowerCase().includes(filter.name.toLowerCase()));
+      const checkGain = stock => (!filter.gain || filter.gain === "All" ||
+      (filter.gain === "Losing" && parseFloat(stock.PercentChange) < 0) ||
+      (filter.gain === "Gaining" && parseFloat(stock.PercentChange) >= 0));
+      const checkRangeFrom = stock => (!filter.range_from || parseFloat(stock.PercentChange) >= filter.range_from);
+      const checkRangeTo = stock => (!filter.range_to || parseFloat(stock.PercentChange) <= filter.range_to);
+      stocks = stocks.filter((stock) => {
+        return checkName(stock) && checkGain(stock) && checkRangeFrom(stock) && checkRangeTo(stock)
+      });
+    }
+
+    view.render(model.getUiState(), stocks)
+  }
+
   function init() {
     fetchStocks('mocks/stocks.json')
-      .then((stocks) => { model.setState(stocks.state) })
-      .then(() => { view.render(model.getState()) });
+      .then((stocks) => { model.setStocks(stocks) })
+      .then(renderView);
     view.setupEventListeners();
   }
 
   function toggleStocksStateAndRender() {
     model.setStocksViewState(model.getStocksViewState() === consts.STOCK_VIEW_STATES.length -1 ? 0 : model.getStocksViewState() + 1);
-    view.render(model.getState());
+    renderView();
   }
 
   function toggleFilterAndRender() {
     model.setFilterEnabled(!model.getFilterEnabled());
-    view.render(model.getState());
+    renderView();
   }
 
   function swapStocksOrder(currStockSymbol, shouldMoveUp) {
     const stocksOrder = model.getStocksOrder();
+    const stocks = model.getStocks();
     const currLocation = stocksOrder.indexOf(currStockSymbol);
     const newLocation = shouldMoveUp ? currLocation - 1 : currLocation + 1;
     if (newLocation >= 0 && newLocation < stocksOrder.length) {
-      const temp = stocksOrder[newLocation];
+      let temp = stocksOrder[newLocation];
       stocksOrder[newLocation] = stocksOrder[currLocation];
       stocksOrder[currLocation] = temp;
+      temp = stocks[newLocation];
+      stocks[newLocation] = stocks[currLocation];
+      stocks[currLocation] = temp;
     }
     model.setStocksOrder(stocksOrder);
-    view.render(model.getState());
+    model.setStocks(stocks);
+    renderView();
   }
 
   function fetchStocks(myRequest) {
@@ -52,11 +76,17 @@
        });
   }
 
+  function setFilterAndRender(filter) {
+    model.setfilters(filter);
+    renderView();
+  }
+
   window.Stokr.Controller = {
     init,
     swapStocksOrder,
     toggleStocksStateAndRender,
-    toggleFilterAndRender
+    toggleFilterAndRender,
+    setFilterAndRender
   };
 
 
