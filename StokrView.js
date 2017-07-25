@@ -77,6 +77,8 @@
   function setupEventListeners() {
     const header = document.querySelector('header');
     header.addEventListener('click', headerClickHandler);
+    const filterApply = document.querySelector('.filter-section form button');
+    filterApply.addEventListener('click', applyFilters);
     const stocksListWrapperDiv = document.querySelector('.stocks-list-wrapper');
     stocksListWrapperDiv.addEventListener('click', stockListContainerClickHandler);
   }
@@ -100,6 +102,11 @@
       const shouldMoveUp = target.dataset.direction === 'up';
       Ctrl.swapStocksOrder(currStockSymbol, shouldMoveUp);
     }
+  }
+
+  function applyFilters(e) {
+    const target = e.target;
+    const Ctrl = window.Stokr.Controller;
   }
 
   window.Stokr.View = {

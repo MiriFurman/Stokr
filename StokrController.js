@@ -11,7 +11,9 @@
   const view = window.Stokr.View;
 
   function init() {
-    view.render(model.getState());
+    fetchStocks('mocks/stocks.json')
+      .then((stocks) => { model.setState(stocks.state) })
+      .then(() => { view.render(model.getState()) });
     view.setupEventListeners();
   }
 
@@ -36,6 +38,18 @@
     }
     model.setStocksOrder(stocksOrder);
     view.render(model.getState());
+  }
+
+  function fetchStocks(myRequest) {
+     return fetch(myRequest)
+       .then((response) => {
+         const contentType = response.headers.get("content-type");
+         if(contentType && contentType.includes("application/json")) {
+           return response.json();
+         } else {
+           throw new TypeError("OH SNAP, we haven't got a JSON!");
+         }
+       });
   }
 
   window.Stokr.Controller = {
