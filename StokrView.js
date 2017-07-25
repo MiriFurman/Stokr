@@ -121,8 +121,14 @@
     let btnData = stock[consts.STOCK_VIEW_STATES[uiState.stocksViewState]];
     btnData = consts.STOCK_VIEW_STATES[uiState.stocksViewState] === 'Change' ? parseFloat(btnData).toFixed(2) : btnData;
     let upDownDisplay = uiState.isFilterEnabled ? 'none' : 'flex';
+    let removebtnDisplay = uiState.isSettingsEnabled ? 'flex' : 'none';
     return `<li class="stock" data-symbol="${stock.Symbol}">
-            <span class="stock-name">${stock.Symbol} (${stock.Name})</span>
+            <div class="stock-data">
+              <div class="icon-remove" data-id="icon-remove" style="display: ${removebtnDisplay}">
+                <div class="icon-remove-inner"></div>
+              </div>
+              <span class="stock-name">${stock.Symbol} (${stock.Name})</span>
+            </div>
             <div class="stock-data">
               <span>${parseFloat(stock.LastTradePriceOnly).toFixed(2)}</span>
               <button class="stock-data-btn ${btnClass}" data-id="stock-data-btn">${btnData}</button>
@@ -150,6 +156,10 @@
 
     if (target.dataset.id === 'filter-btn') {
       Ctrl.toggleFilterAndRender();
+    }
+
+    if (target.dataset.id === 'settings-btn') {
+      Ctrl.toggleSettingsAndRender();
     }
 
     if (target.dataset.id === 'stock-data-btn') {

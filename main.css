@@ -283,3 +283,20 @@ header h1 {
   text-align: center;
   color: #868686;
 }
+
+.icon-remove {
+  width: 44.3px;
+  height: 43px;
+  background-color: #ff4f46;
+  border-radius: 50%;
+  margin-right: 25px;
+  display: flex;
+  justify-content: center;
+}
+
+.icon-remove-inner {
+  width: 28px;
+  height: 2px;
+  border: solid 4px #ffffff;
+  align-self: center;
+}

@@ -46,6 +46,11 @@
     renderView();
   }
 
+  function toggleSettingsAndRender() {
+    model.setSettingsEnabled(!model.getSettingsEnabled());
+    renderView();
+  }
+
   function swapStocksOrder(currStockSymbol, shouldMoveUp) {
     const stocksOrder = model.getStocksOrder();
     const stocks = model.getStocks();
@@ -86,6 +91,7 @@
     swapStocksOrder,
     toggleStocksStateAndRender,
     toggleFilterAndRender,
+    toggleSettingsAndRender,
     setFilterAndRender,
     renderView
   };
