@@ -32,8 +32,8 @@
   function init() {
     fetchStocks('mocks/stocks.json')
       .then((stocks) => { model.setStocks(stocks) })
-      .then(renderView);
-    view.setupEventListeners();
+      .then(renderView)
+      .then(view.setupEventListeners());
   }
 
   function toggleStocksStateAndRender() {
@@ -86,7 +86,8 @@
     swapStocksOrder,
     toggleStocksStateAndRender,
     toggleFilterAndRender,
-    setFilterAndRender
+    setFilterAndRender,
+    renderView
   };
 
 

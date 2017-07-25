@@ -9,14 +9,62 @@
   const consts = window.Stokr.Constants;
 
   function render(uiState, stocks) {
-    renderHeader(uiState);
-    renderStockList(uiState,stocks);
+    if (window.location.hash === "" || window.location.hash === "#") {
+      renderMain();
+      renderHeader(uiState);
+      renderStockList(uiState,stocks);
+    } else if (window.location.hash === "#search"){
+      renderSearch();
+    }
+
+  }
+
+  function renderMain() {
+    const main = document.querySelector('main');
+    main.innerHTML = ` <header>
+          <h1>Stokr</h1>
+          <div class="header-btns">
+            <a href="#search" class="search-btn header-btn icon-search" data-id="search-btn"></a>
+            <button class="refresh-btn header-btn icon-refresh" data-id="refresh-btn"></button>
+            <button class="filter-btn header-btn icon-filter" data-id="filter-btn"></button>
+            <button class="settings-btn header-btn icon-settings" data-id="settings-btn"></button>
+          </div>
+        </header>
+        <section class="filter-section">
+          <form id="filter-form">
+            <div class="filter-form-column first-filter-form-column">
+              <div>
+                <label for="stockName">By Name</label>
+                <input type="text" id="stockName" name="stockName">
+              </div>
+              <div>
+                <label for="stockGain">By Gain</label>
+                <select id="stockGain" name="stockGain">
+                  <option value="All">All</option>
+                  <option value="Losing">Losing</option>
+                  <option value="Gaining">Gaining</option>
+                </select>
+              </div>
+            </div>
+            <div class="filter-form-column second-filter-form-column">
+              <div>
+                <label for="rangeFrom">By Range: From</label>
+                <input type="number" step="0.01" id="rangeFrom" name="rangeFrom">
+              </div>
+              <div>
+                <label for="rangeTo">By Range: To</label>
+                <input type="number" step="0.01" id="rangeTo" name="rangeTo">
+              </div>
+            </div>
+            <button type="submit" class="round-green-btn" data-id="apply-filter">Apply</button>
+          </form>
+        </section>
+        <div class="stocks-list-wrapper"></div>`;
   }
 
   function renderHeader(uiState) {
     renderFilter(uiState);
     renderSettings(uiState);
-    renderSearch(uiState);
   }
 
   function renderFilter(uiState) {
@@ -30,9 +78,27 @@
     }
   }
 
-  function renderSettings(uiState) {}
+  function renderSettings(uiState) {
+    if (uiState.isSettingsEnabled) {
+      document.querySelector('.settings-btn').style.color='#41bf15';
+    } else {
+      document.querySelector('.settings-btn').style.color='#ababab';
+    }
+  }
 
-  function renderSearch(uiState) {}
+  function renderSearch() {
+    const main = document.querySelector('main');
+    main.innerHTML = `<section class="search-section">
+                        <div class="search-input">
+                          <input type="text">
+                          <a class="search-cancel" href="#">Cancel</a>
+                        </div>
+                        <div class="search-placeholder-container">
+                          <div class="search-placeholder-img icon-search-place-holder"></div>
+                          <div class="search-placeholder-text">Search</div>
+                        </div>
+                      </section>`;
+  }
 
   function renderStockList(uiState, stocks) {
     const stocksListWrapperDiv = document.querySelector('.stocks-list-wrapper');
@@ -69,25 +135,22 @@
   }
 
   function setupEventListeners() {
-    const header = document.querySelector('header');
-    header.addEventListener('click', headerClickHandler);
+    const main = document.querySelector('main');
+    main.addEventListener('click', mainClickHandler);
     const filterForm = document.querySelector('#filter-form');
-    filterForm.addEventListener('submit', filterSubmitHandler);
-    const stocksListWrapperDiv = document.querySelector('.stocks-list-wrapper');
-    stocksListWrapperDiv.addEventListener('click', stockListContainerClickHandler);
+    if (filterForm) {
+      filterForm.addEventListener('submit', filterSubmitHandler);
+    }
+    window.addEventListener('hashchange', hashChangeHandler);
   }
 
-  function headerClickHandler(e) {
+  function mainClickHandler(e) {
     const target = e.target;
     const Ctrl = window.Stokr.Controller;
+
     if (target.dataset.id === 'filter-btn') {
       Ctrl.toggleFilterAndRender();
     }
-  }
-
-  function stockListContainerClickHandler(e) {
-    const target = e.target;
-    const Ctrl = window.Stokr.Controller;
 
     if (target.dataset.id === 'stock-data-btn') {
       Ctrl.toggleStocksStateAndRender();
@@ -98,11 +161,11 @@
       const shouldMoveUp = target.dataset.direction === 'up';
       Ctrl.swapStocksOrder(currStockSymbol, shouldMoveUp);
     }
+
   }
 
   function filterSubmitHandler(e) {
     e.preventDefault();
-
     const Ctrl = window.Stokr.Controller;
     const formInputs = e.target.elements;
 
@@ -114,6 +177,11 @@
     };
 
     Ctrl.setFilterAndRender(filter);
+  }
+
+  function hashChangeHandler(e) {
+    const Ctrl = window.Stokr.Controller;
+    Ctrl.renderView();
   }
 
   window.Stokr.View = {

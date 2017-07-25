@@ -15,7 +15,8 @@
       uiState: {
         stocksViewState: 0,
         isFilterEnabled: false,
-        filters: {}
+        filters: {},
+        isSettingsEnabled: false
       },
 
       stocksOrder: [
@@ -59,6 +60,14 @@
 
     setFilterEnabled: function (isEnabled) {
       this.state.uiState.isFilterEnabled = isEnabled;
+    },
+
+    getSettingsEnabled: function () {
+      return this.state.uiState.isSettingsEnabled;
+    },
+
+    setSettingsEnabled: function (isEnabled) {
+      this.state.uiState.isSettingsEnabled = isEnabled;
     },
 
     getFilters: function () {
