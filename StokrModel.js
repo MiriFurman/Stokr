@@ -23,8 +23,6 @@
           "YHOO",
           "APPL",
           "GOOG",
-          "BMW",
-          "GPO",
           "FB"
         ],
       },

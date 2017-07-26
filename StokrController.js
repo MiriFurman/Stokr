@@ -11,10 +11,10 @@
   const view = window.Stokr.View;
 
   function init() {
-    let stocksToFetch = model.getStocksOrder().join();
     if (localStorage.getItem('stokr-state')) {
       model.setUiState(JSON.parse(localStorage.getItem('stokr-state')));
     }
+    let stocksToFetch = model.getStocksOrder().join();
     fetchStocks('http://localhost:7000/quotes?q=' + stocksToFetch)
       .then((stocks) => { model.setStocks(stocks) })
       .then(renderView)
@@ -91,9 +91,11 @@
   }
 
   function removeStock(stockSymbol) {
-    debugger;
     const stockOrder = model.getStocksOrder();
-    stockOrder.splice(stockOrder.indexOf(stockSymbol), 1);
+    const stocks = model.getStocks();
+    const index = stockOrder.indexOf(stockSymbol);
+    stockOrder.splice(index, 1);
+    stocks.splice(index, 1);
     model.setStocksOrder(stockOrder);
     localStorage.setItem('stokr-state', JSON.stringify(model.getUiState()));
     init();
