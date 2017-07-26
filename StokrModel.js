@@ -16,19 +16,18 @@
         stocksViewState: 0,
         isFilterEnabled: false,
         filters: {},
-        isSettingsEnabled: false
+        isSettingsEnabled: false,
+        stocksOrder: [
+          "WIX",
+          "MSFT",
+          "YHOO",
+          "APPL",
+          "GOOG",
+          "BMW",
+          "GPO",
+          "FB"
+        ],
       },
-
-      stocksOrder: [
-        "WIX",
-        "MSFT",
-        "YHOO",
-        "APPL",
-        "GOOG",
-        "BMW",
-        "GPO",
-        "FB"
-      ],
 
       stocks: []
 
@@ -84,11 +83,11 @@
     },
 
     getStocksOrder: function () {
-      return this.state.stocksOrder;
+      return this.state.uiState.stocksOrder;
     },
 
     setStocksOrder: function (stocksOrder) {
-      this.state.stocksOrder = stocksOrder;
+      this.state.uiState.stocksOrder = stocksOrder;
     },
 
     getStocks: function () {

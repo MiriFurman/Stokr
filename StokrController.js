@@ -10,6 +10,29 @@
   const model = window.Stokr.Model;
   const view = window.Stokr.View;
 
+  function init() {
+    let stocksToFetch = model.getStocksOrder().join();
+    if (localStorage.getItem('stokr-state')) {
+      model.setUiState(JSON.parse(localStorage.getItem('stokr-state')));
+    }
+    fetchStocks('http://localhost:7000/quotes?q=' + stocksToFetch)
+      .then((stocks) => { model.setStocks(stocks) })
+      .then(renderView)
+  }
+
+  function fetchStocks(myRequest) {
+    return fetch(myRequest)
+      .then((response) => {
+        const contentType = response.headers.get("content-type");
+        if(contentType && contentType.includes("application/json")) {
+          return response.json();
+        } else {
+          throw new TypeError("OH SNAP, we haven't got a JSON!");
+        }
+      })
+      .then(res => res.query.results.quote);
+  }
+
   function renderView() {
     let stocks = model.getStocks();
     if (model.getFilterEnabled()) {
@@ -26,31 +49,25 @@
     }
 
     view.render(model.getUiState(), stocks);
-
     view.setupEventListeners();
-  }
-
-  function init() {
-    let stocksToFetch = '';
-    model.getStocksOrder().forEach(stockSymbol => stocksToFetch += ',' + stockSymbol);
-    stocksToFetch = stocksToFetch.substr(1);
-    fetchStocks('http://localhost:7000/quotes?q=' + stocksToFetch)
-      .then((stocks) => { model.setStocks(stocks) })
-      .then(renderView)
   }
 
   function toggleStocksStateAndRender() {
     model.setStocksViewState(model.getStocksViewState() === consts.STOCK_VIEW_STATES.length -1 ? 0 : model.getStocksViewState() + 1);
+    localStorage.setItem('stokr-state', JSON.stringify(model.getUiState()));
     renderView();
   }
 
   function toggleFilterAndRender() {
     model.setFilterEnabled(!model.getFilterEnabled());
+    console.log(JSON.stringify(model.getUiState()));
+    localStorage.setItem('stokr-state', JSON.stringify(model.getUiState()));
     renderView();
   }
 
   function toggleSettingsAndRender() {
     model.setSettingsEnabled(!model.getSettingsEnabled());
+    localStorage.setItem('stokr-state', JSON.stringify(model.getUiState()));
     renderView();
   }
 
@@ -69,6 +86,7 @@
     }
     model.setStocksOrder(stocksOrder);
     model.setStocks(stocks);
+    localStorage.setItem('stokr-state', JSON.stringify(model.getUiState()));
     renderView();
   }
 
@@ -77,24 +95,13 @@
     const stockOrder = model.getStocksOrder();
     stockOrder.splice(stockOrder.indexOf(stockSymbol), 1);
     model.setStocksOrder(stockOrder);
+    localStorage.setItem('stokr-state', JSON.stringify(model.getUiState()));
     init();
-  }
-
-  function fetchStocks(myRequest) {
-     return fetch(myRequest)
-       .then((response) => {
-         const contentType = response.headers.get("content-type");
-         if(contentType && contentType.includes("application/json")) {
-           return response.json();
-         } else {
-           throw new TypeError("OH SNAP, we haven't got a JSON!");
-         }
-       })
-       .then(res => res.query.results.quote);
   }
 
   function setFilterAndRender(filter) {
     model.setfilters(filter);
+    localStorage.setItem('stokr-state', JSON.stringify(model.getUiState()));
     renderView();
   }
 

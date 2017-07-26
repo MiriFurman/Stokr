@@ -117,7 +117,7 @@
   }
 
   function renderStock(stock, uiState) {
-    let btnClass = parseFloat(stock.realtime_chg_percent) > 0 ? 'btn-green' : 'btn-red';
+    let btnClass = parseFloat(stock.realtime_chg_percent) >= 0 ? 'btn-green' : 'btn-red';
     let btnData = parseFloat(stock[consts.STOCK_VIEW_STATES[uiState.stocksViewState]]).toFixed(2);
     btnData = consts.STOCK_VIEW_STATES[uiState.stocksViewState] === 'realtime_chg_percent' ? btnData + '%' : btnData + 'B';
     let upDownDisplay = uiState.isFilterEnabled ? 'none' : 'flex';
@@ -160,6 +160,10 @@
 
     if (target.dataset.id === 'filter-btn') {
       Ctrl.toggleFilterAndRender();
+    }
+
+    if (target.dataset.id === 'refresh-btn') {
+      Ctrl.init();
     }
 
     if (target.dataset.id === 'settings-btn') {
