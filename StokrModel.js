@@ -22,10 +22,15 @@
       stocksOrder: [
         "WIX",
         "MSFT",
-        "YHOO"
+        "YHOO",
+        "APPL",
+        "GOOG",
+        "BMW",
+        "GPO",
+        "FB"
       ],
 
-      stocks: {}
+      stocks: []
 
     },
 

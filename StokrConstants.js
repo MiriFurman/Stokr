@@ -12,7 +12,7 @@
   window.Stokr = window.Stokr || {};
 
   window.Stokr.Constants = {
-    STOCK_VIEW_STATES: ['PercentChange', 'Change'] //To Add - 'MarketCapital'
+    STOCK_VIEW_STATES: ['realtime_chg_percent', 'MarketCapitalization'] //To Add - 'MarketCapital'
   }
 
 

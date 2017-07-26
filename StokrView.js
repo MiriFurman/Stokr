@@ -117,15 +117,15 @@
   }
 
   function renderStock(stock, uiState) {
-    let btnClass = parseFloat(stock.PercentChange) > 0 ? 'btn-green' : 'btn-red';
-    let btnData = stock[consts.STOCK_VIEW_STATES[uiState.stocksViewState]];
-    btnData = consts.STOCK_VIEW_STATES[uiState.stocksViewState] === 'Change' ? parseFloat(btnData).toFixed(2) : btnData;
+    let btnClass = parseFloat(stock.realtime_chg_percent) > 0 ? 'btn-green' : 'btn-red';
+    let btnData = parseFloat(stock[consts.STOCK_VIEW_STATES[uiState.stocksViewState]]).toFixed(2);
+    btnData = consts.STOCK_VIEW_STATES[uiState.stocksViewState] === 'realtime_chg_percent' ? btnData + '%' : btnData + 'B';
     let upDownDisplay = uiState.isFilterEnabled ? 'none' : 'flex';
     let removebtnDisplay = uiState.isSettingsEnabled ? 'flex' : 'none';
     return `<li class="stock" data-symbol="${stock.Symbol}">
             <div class="stock-data">
-              <div class="icon-remove" data-id="icon-remove" style="display: ${removebtnDisplay}">
-                <div class="icon-remove-inner"></div>
+              <div class="icon-remove" data-id="remove-btn" style="display: ${removebtnDisplay}">
+                <div class="icon-remove-inner" data-id="remove-btn"></div>
               </div>
               <span class="stock-name">${stock.Symbol} (${stock.Name})</span>
             </div>
@@ -139,6 +139,10 @@
             </div>
           </li>`
   }
+
+  /**
+   * Events
+   */
 
   function setupEventListeners() {
     const main = document.querySelector('main');
@@ -172,6 +176,11 @@
       Ctrl.swapStocksOrder(currStockSymbol, shouldMoveUp);
     }
 
+    if (target.dataset.id === 'remove-btn') {
+      const currStockSymbol = target.closest('li').dataset.symbol;
+      Ctrl.removeStock(currStockSymbol);
+    }
+
   }
 
   function filterSubmitHandler(e) {
@@ -181,7 +190,7 @@
 
     const filter = {
       name: formInputs.stockName.value,
-      gain: formInputs.stockGain.value,
+      gain: formInputs.stockGain.options[formInputs.stockGain.selectedIndex].value,
       range_from: formInputs.rangeFrom.value,
       range_to: formInputs.rangeTo.value
     };

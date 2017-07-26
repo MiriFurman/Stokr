@@ -30,6 +30,7 @@ button {
   cursor: pointer;
   display: inline-block;
   margin: 5px;
+  background: none;
 }
 
 .main-wrapper {
@@ -42,13 +43,13 @@ main {
   display: flex;
   flex-direction: column;
   width: 1300px;
-  height: 819px;
-  /*max-height: 819px;*/
+  /*height: 820px;*/
+  max-height: 820px;
   background-color: #ffffff;
   margin: 0 auto;
   border-radius: 10px;
-  padding: 30px 0 0 0;
   position: relative;
+  overflow: auto;
 }
 
 header {
@@ -59,14 +60,17 @@ header {
 
 header h1 {
   width: 166px;
-  height: 46px;
   font-family: LucidaGrande;
   font-size: 39px;
   font-weight: bold;
   text-align: left;
   color: #41bf15;
   text-transform: uppercase;
-  margin: 0;
+  margin: 35px 0;
+}
+
+.header-btns {
+  margin-top: 30px;
 }
 
 .header-btn {
@@ -179,6 +183,7 @@ header h1 {
   display: none;
   padding: 10px 30px;
   border-top: solid 1px #e5e5e5;
+  margin-top: 90px;
 }
 
 .filter-section form {
@@ -292,6 +297,7 @@ header h1 {
   margin-right: 25px;
   display: flex;
   justify-content: center;
+  cursor: pointer;
 }
 
 .icon-remove-inner {
@@ -299,4 +305,5 @@ header h1 {
   height: 2px;
   border: solid 4px #ffffff;
   align-self: center;
+  cursor: pointer;
 }

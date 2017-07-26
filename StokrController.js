@@ -12,28 +12,31 @@
 
   function renderView() {
     let stocks = model.getStocks();
-
     if (model.getFilterEnabled()) {
       const filter = model.getFilters();
       const checkName = stock => (!filter.name || stock.Name.toLowerCase().includes(filter.name.toLowerCase()));
       const checkGain = stock => (!filter.gain || filter.gain === "All" ||
-      (filter.gain === "Losing" && parseFloat(stock.PercentChange) < 0) ||
-      (filter.gain === "Gaining" && parseFloat(stock.PercentChange) >= 0));
-      const checkRangeFrom = stock => (!filter.range_from || parseFloat(stock.PercentChange) >= filter.range_from);
-      const checkRangeTo = stock => (!filter.range_to || parseFloat(stock.PercentChange) <= filter.range_to);
+      (filter.gain === "Losing" && parseFloat(stock.realtime_chg_percent) < 0) ||
+      (filter.gain === "Gaining" && parseFloat(stock.realtime_chg_percent) >= 0));
+      const checkRangeFrom = stock => (!filter.range_from || parseFloat(stock.realtime_chg_percent) >= filter.range_from);
+      const checkRangeTo = stock => (!filter.range_to || parseFloat(stock.realtime_chg_percent) <= filter.range_to);
       stocks = stocks.filter((stock) => {
         return checkName(stock) && checkGain(stock) && checkRangeFrom(stock) && checkRangeTo(stock)
       });
     }
 
-    view.render(model.getUiState(), stocks)
+    view.render(model.getUiState(), stocks);
+
+    view.setupEventListeners();
   }
 
   function init() {
-    fetchStocks('mocks/stocks.json')
+    let stocksToFetch = '';
+    model.getStocksOrder().forEach(stockSymbol => stocksToFetch += ',' + stockSymbol);
+    stocksToFetch = stocksToFetch.substr(1);
+    fetchStocks('http://localhost:7000/quotes?q=' + stocksToFetch)
       .then((stocks) => { model.setStocks(stocks) })
       .then(renderView)
-      .then(view.setupEventListeners());
   }
 
   function toggleStocksStateAndRender() {
@@ -69,6 +72,14 @@
     renderView();
   }
 
+  function removeStock(stockSymbol) {
+    debugger;
+    const stockOrder = model.getStocksOrder();
+    stockOrder.splice(stockOrder.indexOf(stockSymbol), 1);
+    model.setStocksOrder(stockOrder);
+    init();
+  }
+
   function fetchStocks(myRequest) {
      return fetch(myRequest)
        .then((response) => {
@@ -78,7 +89,8 @@
          } else {
            throw new TypeError("OH SNAP, we haven't got a JSON!");
          }
-       });
+       })
+       .then(res => res.query.results.quote);
   }
 
   function setFilterAndRender(filter) {
@@ -93,6 +105,7 @@
     toggleFilterAndRender,
     toggleSettingsAndRender,
     setFilterAndRender,
+    removeStock,
     renderView
   };
 
