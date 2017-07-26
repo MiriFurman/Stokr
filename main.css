@@ -246,6 +246,8 @@ header h1 {
   background-color: #ffffff;
   border: solid 1px #408be3;
   font-size: 32px;
+  color: #607982;
+  outline: none;
 }
 
 .search-cancel {
@@ -302,3 +304,34 @@ header h1 {
   align-self: center;
   cursor: pointer;
 }
+
+.search-result-spans {
+  display: flex;
+}
+
+.stock-data .search-stock-syombol {
+  font-weight: 300;
+}
+
+.stock-data .search-stock-exch {
+  color: black;
+  padding-right: 10px;
+  font-weight: 300;
+  margin-left: 20px;
+}
+
+.add-stock-btn {
+  width: 70px;
+  height: 55px;
+  border-radius: 10px;
+  background-color: #41bf15;
+  color: white;
+  font-size: 60px;
+  /*text-align: center;*/
+  font-weight: 300;
+}
+
+/*.add-stock-btn::before {*/
+  /*content: "+";*/
+  /*line-height: 1;*/
+/*}*/

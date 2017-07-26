@@ -89,10 +89,12 @@
   function renderSearch() {
     const main = document.querySelector('main');
     main.innerHTML = `<section class="search-section">
-                        <div class="search-input">
-                          <input type="text">
-                          <a class="search-cancel" href="#">Cancel</a>
-                        </div>
+                        <form id="search-form">
+                          <div class="search-input">
+                            <input type="text" name="searchStock">
+                            <a class="search-cancel" href="#">Cancel</a>
+                          </div>
+                        </form>
                         <div class="search-placeholder-container">
                           <div class="search-placeholder-img icon-search-place-holder"></div>
                           <div class="search-placeholder-text">Search</div>
@@ -140,6 +142,28 @@
           </li>`
   }
 
+  function renderSearchResult(stocks) {
+    if (stocks.length === 0) {
+      const placeholderTextDiv = document.querySelector('.search-placeholder-text');
+      placeholderTextDiv.innerText = 'Not Found';
+    } else {
+      const searchContainer = document.querySelector('.search-placeholder-container');
+      searchContainer.innerHTML = '<ul class="stocks-list">' + stocks.map((stock) => renderSearchStock(stock)).join('') + '</ul>';
+    }
+  }
+
+  function renderSearchStock(stock) {
+    return `<li class="stock" data-symbol="${stock.symbol}">
+              <div class="stock-data">
+               <span class="search-stock-syombol">${stock.symbol}</span>
+               <span class="search-stock-exch">(${stock.exchDisp})</span>
+              </div>
+              <div class="stock-data">
+                <button class="add-stock-btn">+</button>
+              </div>
+            </li>`
+  }
+
   /**
    * Events
    */
@@ -150,6 +174,10 @@
     const filterForm = document.querySelector('#filter-form');
     if (filterForm) {
       filterForm.addEventListener('submit', filterSubmitHandler);
+    }
+    const searchForm = document.querySelector('#search-form');
+    if (searchForm) {
+      searchForm.addEventListener('submit', searchSubmitHandler);
     }
     window.addEventListener('hashchange', hashChangeHandler);
   }
@@ -202,6 +230,13 @@
     Ctrl.setFilterAndRender(filter);
   }
 
+  function searchSubmitHandler(e) {
+    e.preventDefault();
+    const Ctrl = window.Stokr.Controller;
+    const formInputs = e.target.elements;
+    Ctrl.searchAndRender(formInputs.searchStock.value);
+  }
+
   function hashChangeHandler(e) {
     const Ctrl = window.Stokr.Controller;
     Ctrl.renderView();
@@ -209,7 +244,8 @@
 
   window.Stokr.View = {
     render,
-    setupEventListeners
+    setupEventListeners,
+    renderSearchResult
   }
 
 })();

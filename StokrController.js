@@ -33,6 +33,19 @@
       .then(res => res.query.results.quote);
   }
 
+  function searchStocks(myRequest) {
+    return fetch(myRequest)
+      .then((response) => {
+        const contentType = response.headers.get("content-type");
+        if(contentType && contentType.includes("application/json")) {
+          return response.json();
+        } else {
+          throw new TypeError("OH SNAP, we haven't got a JSON!");
+        }
+      })
+      .then(res => res.ResultSet.Result);
+  }
+
   function renderView() {
     let stocks = model.getStocks();
     if (model.getFilterEnabled()) {
@@ -107,6 +120,12 @@
     renderView();
   }
 
+  function searchAndRender(stockToSearch) {
+    searchStocks('http://localhost:7000/search?q=' + stockToSearch)
+      // .then(console.log)
+      .then(view.renderSearchResult);
+  }
+
   window.Stokr.Controller = {
     init,
     swapStocksOrder,
@@ -115,6 +134,7 @@
     toggleSettingsAndRender,
     setFilterAndRender,
     removeStock,
+    searchAndRender,
     renderView
   };
 
