@@ -7,6 +7,56 @@
   url("assets/fonts/HelveticaNeueW01-55Roman.svg#helvetica_neue") format("svg");
 }
 
+@keyframes fadeInUp {
+   0% {
+     opacity: 0;
+     transform: translateY(30px);
+   }
+
+   100% {
+     opacity: 1;
+     transform: none;
+   }
+ }
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+
+.transition-fadein-up {
+  animation-name: fadeInUp;
+  animation-duration: 0.5s;
+}
+
+.transition-fadein-down {
+  animation-name: fadeInDown;
+  animation-duration: 0.5s;
+}
+
+.transition-fadein {
+  animation-name: fadeIn;
+  animation-duration: 0.1s;
+}
+
 html {
   box-sizing: border-box;
   height: 100%;
@@ -66,6 +116,10 @@ header h1 {
 
 .header-btns {
   margin-top: 30px;
+}
+
+.btn-green-font {
+  color: #41bf15;
 }
 
 .header-btn {

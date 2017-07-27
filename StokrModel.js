@@ -17,7 +17,7 @@
         isFilterEnabled: false,
         filters: {},
         isSettingsEnabled: false,
-        stocksOrder: [
+        stocksOrder: [  // TODO - 27/07/2017 -  remove to own property + server
           "WIX",
           "MSFT",
           "YHOO",

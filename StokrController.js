@@ -14,13 +14,13 @@
     if (localStorage.getItem('stokr-state')) {
       model.setUiState(JSON.parse(localStorage.getItem('stokr-state')));
     }
-    let stocksToFetch = model.getStocksOrder().join();
+    const stocksToFetch = model.getStocksOrder().join();
     fetchStocks('http://localhost:7000/quotes?q=' + stocksToFetch)
-      .then((stocks) => { model.setStocks(stocks) })
+      .then((stocks) => model.setStocks(stocks))
       .then(renderView)
   }
 
-  function fetchStocks(myRequest) {
+  function fetchStocks(myRequest) { // TODO - 27/07/2017 -  move to api service + fetchJson
     return fetch(myRequest)
       .then((response) => {
         const contentType = response.headers.get("content-type");
@@ -46,7 +46,7 @@
       .then(res => res.ResultSet.Result);
   }
 
-  function renderView() {
+  function renderView() { // TODO - 27/07/2017 -  filter logic to other function
     let stocks = model.getStocks();
     if (model.getFilterEnabled()) {
       const filter = model.getFilters();
@@ -56,7 +56,7 @@
       (filter.gain === "Gaining" && parseFloat(stock.realtime_chg_percent) >= 0));
       const checkRangeFrom = stock => (!filter.range_from || parseFloat(stock.realtime_chg_percent) >= filter.range_from);
       const checkRangeTo = stock => (!filter.range_to || parseFloat(stock.realtime_chg_percent) <= filter.range_to);
-      stocks = stocks.filter((stock) => {
+      stocks = stocks.filter((stock) => { // TODO - 27/07/2017 -  checkStock func
         return checkName(stock) && checkGain(stock) && checkRangeFrom(stock) && checkRangeTo(stock)
       });
     }
@@ -65,21 +65,25 @@
     view.setupEventListeners();
   }
 
+  function saveUiStateToLocalStorage() {
+    localStorage.setItem('stokr-state', JSON.stringify(model.getUiState()));
+  }
+
   function toggleStocksStateAndRender() {
     model.setStocksViewState(model.getStocksViewState() === consts.STOCK_VIEW_STATES.length -1 ? 0 : model.getStocksViewState() + 1);
-    localStorage.setItem('stokr-state', JSON.stringify(model.getUiState()));
+    saveUiStateToLocalStorage();
     renderView();
   }
 
   function toggleFilterAndRender() {
     model.setFilterEnabled(!model.getFilterEnabled());
-    localStorage.setItem('stokr-state', JSON.stringify(model.getUiState()));
+    saveUiStateToLocalStorage();
     renderView();
   }
 
-  function toggleSettingsAndRender() {
+  function toggleSettingsAndRender() { // TODO - 27/07/2017 -  settings or filter
     model.setSettingsEnabled(!model.getSettingsEnabled());
-    localStorage.setItem('stokr-state', JSON.stringify(model.getUiState()));
+    saveUiStateToLocalStorage();
     renderView();
   }
 
@@ -88,7 +92,7 @@
     const stocks = model.getStocks();
     const currLocation = stocksOrder.indexOf(currStockSymbol);
     const newLocation = shouldMoveUp ? currLocation - 1 : currLocation + 1;
-    if (newLocation >= 0 && newLocation < stocksOrder.length) {
+    if (newLocation >= 0 && newLocation < stocksOrder.length) { // TODO - 27/07/2017 -  inner swap
       let temp = stocksOrder[newLocation];
       stocksOrder[newLocation] = stocksOrder[currLocation];
       stocksOrder[currLocation] = temp;
@@ -98,7 +102,7 @@
     }
     model.setStocksOrder(stocksOrder);
     model.setStocks(stocks);
-    localStorage.setItem('stokr-state', JSON.stringify(model.getUiState()));
+    saveUiStateToLocalStorage();
     renderView();
   }
 
@@ -109,18 +113,18 @@
     stockOrder.splice(index, 1);
     stocks.splice(index, 1);
     model.setStocksOrder(stockOrder);
-    localStorage.setItem('stokr-state', JSON.stringify(model.getUiState()));
+    saveUiStateToLocalStorage();
     init();
   }
 
   function setFilterAndRender(filter) {
     model.setfilters(filter);
-    localStorage.setItem('stokr-state', JSON.stringify(model.getUiState()));
+    saveUiStateToLocalStorage();
     renderView();
   }
 
-  function searchAndRender(stockToSearch) {
-    searchStocks('http://localhost:7000/search?q=' + stockToSearch)
+  function searchAndRender(stockToSearch) { // TODO - 27/07/2017 -  move to api service
+    searchStocks(`http://localhost:7000/search?q=${stockToSearch}`) // TODO - 27/07/2017 -  es6 template strings
       .then((res) => view.renderSearchResult(res, model.getStocksOrder()));
   }
 

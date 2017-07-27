@@ -19,9 +19,10 @@
 
   }
 
-  function renderMain() {
+  function renderMain() { // TODO - 27/07/2017 -  render filter and settings before inner html
     const main = document.querySelector('main');
-    main.innerHTML = consts.mainTemplate;
+    main.innerHTML = consts.mainTemplate; // TODO - 27/07/2017 -  create function that chakes state and filters by it
+    // TODO - 27/07/2017 -  dynamic template
   }
 
   function renderHeader(uiState) {
@@ -33,7 +34,7 @@
     const filterSection = document.querySelector('.filter-section');
     if (uiState.isFilterEnabled) {
       filterSection.style.display = 'block';
-      document.querySelector('.filter-btn').style.color='#41bf15';
+      document.querySelector('.filter-btn').style.color='#41bf15'; // TODO - 27/07/2017 -  toggle class,
     } else {
       filterSection.style.display = 'none';
       document.querySelector('.filter-btn').style.color='#ababab';
@@ -75,7 +76,7 @@
     btnData = consts.STOCK_VIEW_STATES[uiState.stocksViewState] === 'realtime_chg_percent' ? btnData + '%' : btnData + 'B';
     let upDownDisplay = uiState.isFilterEnabled ? 'none' : 'flex';
     let removebtnDisplay = uiState.isSettingsEnabled ? 'flex' : 'none';
-    return `<li class="stock" data-symbol="${stock.Symbol}">
+    return `<li class="stock transition-fadein" data-symbol="${stock.Symbol}">
             <div class="stock-data">
               <div class="icon-remove" data-id="remove-btn" style="display: ${removebtnDisplay}">
                 <div class="icon-remove-inner" data-id="remove-btn"></div>
@@ -103,7 +104,7 @@
     } else {
       searchRes = searchRes.filter((stock) => {
         return stocksOrder.indexOf(stock.symbol) === -1;
-      });
+      }); // TODO - 27/07/2017 -  es6 template instead of +
       searchContainer.innerHTML = '<ul class="stocks-list">' + searchRes.map((stock) => renderSearchStock(stock)).join('') + '</ul>';
       searchContainer.addEventListener('click', searchClickHandler);
       searchContainer.style.display = 'block';
@@ -149,7 +150,7 @@
     }
 
     if (target.dataset.id === 'refresh-btn') {
-      Ctrl.init();
+      Ctrl.init(); // TODO - 27/07/2017 -  change to refresh and remove init export
     }
 
     if (target.dataset.id === 'settings-btn') {
