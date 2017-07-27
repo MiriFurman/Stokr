@@ -73,7 +73,6 @@
 
   function toggleFilterAndRender() {
     model.setFilterEnabled(!model.getFilterEnabled());
-    console.log(JSON.stringify(model.getUiState()));
     localStorage.setItem('stokr-state', JSON.stringify(model.getUiState()));
     renderView();
   }
