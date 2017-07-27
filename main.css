@@ -119,7 +119,7 @@ header h1 {
 }
 
 .btn-green-font {
-  color: #41bf15;
+  color: #41bf15 !important;
 }
 
 .header-btn {

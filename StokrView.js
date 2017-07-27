@@ -10,56 +10,67 @@
 
   function render(uiState, stocks) {
     if (window.location.hash === "" || window.location.hash === "#") {
-      renderMain();
-      renderHeader(uiState);
-      renderStockList(uiState,stocks);
+      renderMain(uiState,stocks);
     } else if (window.location.hash === "#search"){
       renderSearch();
     }
 
   }
 
-  function renderMain() { // TODO - 27/07/2017 -  render filter and settings before inner html
+  function renderMain(uiState,stocks) {
     const main = document.querySelector('main');
-    main.innerHTML = consts.mainTemplate; // TODO - 27/07/2017 -  create function that chakes state and filters by it
-    // TODO - 27/07/2017 -  dynamic template
-  }
+    const filterDisplay = uiState.isFilterEnabled ? 'block' : 'none';
+    const filterBtnColorClass = uiState.isFilterEnabled ? 'btn-green-font' : '';
+    const settingsBtnColorClass = uiState.isSettingsEnabled ? 'btn-green-font' : '';
+    main.innerHTML = `<header class="transition-fadein">
+            <h1>Stokr</h1>
+            <div class="header-btns">
+              <a href="#search" class="search-btn header-btn icon-search" data-id="search-btn"></a>
+              <button class="refresh-btn header-btn icon-refresh" data-id="refresh-btn"></button>
+              <button class="${filterBtnColorClass} filter-btn header-btn icon-filter" data-id="filter-btn"></button>
+              <button class="${settingsBtnColorClass} settings-btn header-btn icon-settings" data-id="settings-btn"></button>
+            </div>
+          </header>
+          <section class="filter-section transition-fadein-down" style="display: ${filterDisplay}">
+            <form id="filter-form">
+              <div class="filter-form-column first-filter-form-column">
+                <div>
+                  <label for="stockName">By Name</label>
+                  <input type="text" id="stockName" name="stockName">
+                </div>
+                <div>
+                  <label for="stockGain">By Gain</label>
+                  <select id="stockGain" name="stockGain">
+                    <option value="All">All</option>
+                    <option value="Losing">Losing</option>
+                    <option value="Gaining">Gaining</option>
+                  </select>
+                </div>
+              </div>
+              <div class="filter-form-column second-filter-form-column">
+                <div>
+                  <label for="rangeFrom">By Range: From</label>
+                  <input type="number" step="0.01" id="rangeFrom" name="rangeFrom">
+                </div>
+                <div>
+                  <label for="rangeTo">By Range: To</label>
+                  <input type="number" step="0.01" id="rangeTo" name="rangeTo">
+                </div>
+              </div>
+              <button type="submit" class="round-green-btn" data-id="apply-filter">Apply</button>
+            </form>
+          </section>
+          <div class="stocks-list-wrapper">
+            <ul class="stocks-list">${stocks.map((stock) => renderStock(stock,uiState)).join('')}</ul>
+          </div>`;
 
-  function renderHeader(uiState) {
-    renderFilter(uiState);
-    renderSettings(uiState);
-  }
-
-  function renderFilter(uiState) {
-    const filterSection = document.querySelector('.filter-section');
-    if (uiState.isFilterEnabled) {
-      filterSection.style.display = 'block';
-      document.querySelector('.filter-btn').style.color='#41bf15'; // TODO - 27/07/2017 -  toggle class,
-    } else {
-      filterSection.style.display = 'none';
-      document.querySelector('.filter-btn').style.color='#ababab';
-    }
-  }
-
-  function renderSettings(uiState) {
-    if (uiState.isSettingsEnabled) {
-      document.querySelector('.settings-btn').style.color='#41bf15';
-    } else {
-      document.querySelector('.settings-btn').style.color='#ababab';
-    }
+    disableButtons();
   }
 
   function renderSearch() {
     const main = document.querySelector('main');
     main.innerHTML = consts.searchTemplate;
   }
-
-  function renderStockList(uiState, stocks) {
-    const stocksListWrapperDiv = document.querySelector('.stocks-list-wrapper');
-    stocksListWrapperDiv.innerHTML = '<ul class="stocks-list">' + stocks.map((stock) => renderStock(stock,uiState)).join('') + '</ul>';
-    disableButtons();
-  }
-
 
   function disableButtons() {
     if (document.querySelector('.stock:first-child .btn-up')) {
@@ -73,7 +84,7 @@
   function renderStock(stock, uiState) {
     let btnClass = parseFloat(stock.realtime_chg_percent) >= 0 ? 'btn-green' : 'btn-red';
     let btnData = parseFloat(stock[consts.STOCK_VIEW_STATES[uiState.stocksViewState]]).toFixed(2);
-    btnData = consts.STOCK_VIEW_STATES[uiState.stocksViewState] === 'realtime_chg_percent' ? btnData + '%' : btnData + 'B';
+    btnData = consts.STOCK_VIEW_STATES[uiState.stocksViewState] === 'realtime_chg_percent' ? `${btnData}%` : `${btnData}B`;
     let upDownDisplay = uiState.isFilterEnabled ? 'none' : 'flex';
     let removebtnDisplay = uiState.isSettingsEnabled ? 'flex' : 'none';
     return `<li class="stock transition-fadein" data-symbol="${stock.Symbol}">
@@ -104,8 +115,8 @@
     } else {
       searchRes = searchRes.filter((stock) => {
         return stocksOrder.indexOf(stock.symbol) === -1;
-      }); // TODO - 27/07/2017 -  es6 template instead of +
-      searchContainer.innerHTML = '<ul class="stocks-list">' + searchRes.map((stock) => renderSearchStock(stock)).join('') + '</ul>';
+      });
+      searchContainer.innerHTML = `<ul class="stocks-list">${searchRes.map((stock) => renderSearchStock(stock)).join('')}</ul>`;
       searchContainer.addEventListener('click', searchClickHandler);
       searchContainer.style.display = 'block';
     }
@@ -150,7 +161,7 @@
     }
 
     if (target.dataset.id === 'refresh-btn') {
-      Ctrl.init(); // TODO - 27/07/2017 -  change to refresh and remove init export
+      Ctrl.refreshStocks();
     }
 
     if (target.dataset.id === 'settings-btn') {

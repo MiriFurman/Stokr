@@ -128,6 +128,16 @@
       .then((res) => view.renderSearchResult(res, model.getStocksOrder()));
   }
 
+  function refreshStocks() {
+    if (localStorage.getItem('stokr-state')) {
+      model.setUiState(JSON.parse(localStorage.getItem('stokr-state')));
+    }
+    const stocksToFetch = model.getStocksOrder().join();
+    apiService.fetchStocks(stocksToFetch)
+      .then((stocks) => model.setStocks(stocks))
+      .then(renderView);
+  }
+
   function addNewStock(symbol) {
     const stockOrder = model.getStocksOrder();
     stockOrder.push(symbol);
@@ -137,7 +147,6 @@
   }
 
   window.Stokr.Controller = {
-    init,
     swapStocksOrder,
     toggleStocksStateAndRender,
     toggleFilterAndRender,
@@ -146,10 +155,12 @@
     removeStock,
     searchAndRender,
     addNewStock,
-    renderView
+    renderView,
+    refreshStocks
   };
 
 
-  window.Stokr.Controller.init();
+  init();
+
 })();
 
