@@ -69,7 +69,18 @@
 
   function renderSearch() {
     const main = document.querySelector('main');
-    main.innerHTML = consts.searchTemplate;
+    main.innerHTML = `<section class="search-section transition-fadein-up">
+                        <form id="search-form">
+                          <div class="search-input">
+                            <input type="text" name="searchStock">
+                            <a class="search-cancel" href="#">Cancel</a>
+                          </div>
+                        </form>
+                        <div class="search-placeholder-container">
+                          <div class="search-placeholder-img icon-search-place-holder"></div>
+                          <div class="search-placeholder-text">Search</div>
+                        </div>
+                      </section>`;
   }
 
   function disableButtons() {
@@ -217,8 +228,11 @@
     const target = e.target;
     if (target.dataset.id === 'add-stock-btn') {
       const currStock= target.closest('li');
+      currStock.classList.add('transition-fadeout-right');
       const currStockSymbol = currStock.dataset.symbol;
-      currStock.parentNode.removeChild(currStock);
+      setTimeout(function () {
+        currStock.parentNode.removeChild(currStock);
+      }, 1000);
       Ctrl.addNewStock(currStockSymbol);
     }
   }
