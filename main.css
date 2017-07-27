@@ -248,6 +248,7 @@ header h1 {
   font-size: 32px;
   color: #607982;
   outline: none;
+  padding-left: 20px;
 }
 
 .search-cancel {
@@ -321,17 +322,14 @@ header h1 {
 }
 
 .add-stock-btn {
-  width: 70px;
-  height: 55px;
   border-radius: 10px;
   background-color: #41bf15;
   color: white;
-  font-size: 60px;
-  /*text-align: center;*/
-  font-weight: 300;
+  font-size: 70px;
+  font-weight: 200;
+  height: 50px;
+  width: 80px;
+  line-height: 50px;
+  padding-bottom: 62px;
 }
 
-/*.add-stock-btn::before {*/
-  /*content: "+";*/
-  /*line-height: 1;*/
-/*}*/
