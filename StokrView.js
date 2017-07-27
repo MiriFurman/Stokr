@@ -142,13 +142,20 @@
           </li>`
   }
 
-  function renderSearchResult(stocks) {
-    if (stocks.length === 0) {
-      const placeholderTextDiv = document.querySelector('.search-placeholder-text');
-      placeholderTextDiv.innerText = 'Not Found';
+  function renderSearchResult(searchRes, stocksOrder) {
+    const searchContainer = document.querySelector('.search-placeholder-container');
+    if (searchRes.length === 0) {
+      searchContainer.innerHTML =
+        `<div class="search-placeholder-img icon-search-place-holder"></div>
+         <div class="search-placeholder-text">Not Found</div>`;
+      searchContainer.style.display = 'flex';
     } else {
-      const searchContainer = document.querySelector('.search-placeholder-container');
-      searchContainer.innerHTML = '<ul class="stocks-list">' + stocks.map((stock) => renderSearchStock(stock)).join('') + '</ul>';
+      searchRes = searchRes.filter((stock) => {
+        return stocksOrder.indexOf(stock.symbol) === -1;
+      });
+      searchContainer.innerHTML = '<ul class="stocks-list">' + searchRes.map((stock) => renderSearchStock(stock)).join('') + '</ul>';
+      searchContainer.addEventListener('click', searchClickHandler);
+      searchContainer.style.display = 'block';
     }
   }
 
@@ -159,7 +166,7 @@
                <span class="search-stock-exch">(${stock.exchDisp})</span>
               </div>
               <div class="stock-data">
-                <button class="add-stock-btn">+</button>
+                <button class="add-stock-btn" data-id="add-stock-btn">+</button>
               </div>
             </li>`
   }
@@ -240,6 +247,17 @@
   function hashChangeHandler(e) {
     const Ctrl = window.Stokr.Controller;
     Ctrl.renderView();
+  }
+
+  function searchClickHandler(e) {
+    const Ctrl = window.Stokr.Controller;
+    const target = e.target;
+    if (target.dataset.id === 'add-stock-btn') {
+      const currStock= target.closest('li');
+      const currStockSymbol = currStock.dataset.symbol;
+      currStock.parentNode.removeChild(currStock);
+      Ctrl.addNewStock(currStockSymbol);
+    }
   }
 
   window.Stokr.View = {

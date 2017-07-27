@@ -122,8 +122,15 @@
 
   function searchAndRender(stockToSearch) {
     searchStocks('http://localhost:7000/search?q=' + stockToSearch)
-      // .then(console.log)
-      .then(view.renderSearchResult);
+      .then((res) => view.renderSearchResult(res, model.getStocksOrder()));
+  }
+
+  function addNewStock(symbol) {
+    const stockOrder = model.getStocksOrder();
+    stockOrder.push(symbol);
+    model.setStocksOrder(stockOrder);
+    fetchStocks('http://localhost:7000/quotes?q=' + model.getStocksOrder())
+      .then((stocks) => { model.setStocks(stocks) });
   }
 
   window.Stokr.Controller = {
@@ -135,6 +142,7 @@
     setFilterAndRender,
     removeStock,
     searchAndRender,
+    addNewStock,
     renderView
   };
 
