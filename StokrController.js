@@ -9,56 +9,48 @@
   const consts = window.Stokr.Constants;
   const model = window.Stokr.Model;
   const view = window.Stokr.View;
+  const apiService = window.Stokr.ApiService;
 
   function init() {
     if (localStorage.getItem('stokr-state')) {
       model.setUiState(JSON.parse(localStorage.getItem('stokr-state')));
     }
     const stocksToFetch = model.getStocksOrder().join();
-    fetchStocks('http://localhost:7000/quotes?q=' + stocksToFetch)
+    apiService.fetchStocks(stocksToFetch)
       .then((stocks) => model.setStocks(stocks))
-      .then(renderView)
+      .then(renderView);
   }
 
-  function fetchStocks(myRequest) { // TODO - 27/07/2017 -  move to api service + fetchJson
-    return fetch(myRequest)
-      .then((response) => {
-        const contentType = response.headers.get("content-type");
-        if(contentType && contentType.includes("application/json")) {
-          return response.json();
-        } else {
-          throw new TypeError("OH SNAP, we haven't got a JSON!");
-        }
-      })
-      .then(res => res.query.results.quote);
+  function checkStockByFilter(stock) {
+    return checkNameFilter(stock) && checkGainFilter(stock) && checkRangeFromFilter(stock) && checkRangeToFilter(stock);
   }
 
-  function searchStocks(myRequest) {
-    return fetch(myRequest)
-      .then((response) => {
-        const contentType = response.headers.get("content-type");
-        if(contentType && contentType.includes("application/json")) {
-          return response.json();
-        } else {
-          throw new TypeError("OH SNAP, we haven't got a JSON!");
-        }
-      })
-      .then(res => res.ResultSet.Result);
+  function checkNameFilter(stock) {
+    const filter = model.getFilters();
+    return !filter.name || stock.Name.toLowerCase().includes(filter.name.toLowerCase());
   }
 
-  function renderView() { // TODO - 27/07/2017 -  filter logic to other function
+  function checkGainFilter(stock) {
+    const filter = model.getFilters();
+    return !filter.gain || filter.gain === "All" ||
+      (filter.gain === "Losing" && parseFloat(stock.realtime_chg_percent) < 0) ||
+      (filter.gain === "Gaining" && parseFloat(stock.realtime_chg_percent) >= 0);
+  }
+
+  function checkRangeFromFilter(stock) {
+    const filter = model.getFilters();
+    return !filter.range_from || parseFloat(stock.realtime_chg_percent) >= filter.range_from;
+  }
+
+  function checkRangeToFilter(stock) {
+    const filter = model.getFilters();
+    return !filter.range_to || parseFloat(stock.realtime_chg_percent) <= filter.range_to;
+  }
+
+  function renderView() {
     let stocks = model.getStocks();
     if (model.getFilterEnabled()) {
-      const filter = model.getFilters();
-      const checkName = stock => (!filter.name || stock.Name.toLowerCase().includes(filter.name.toLowerCase()));
-      const checkGain = stock => (!filter.gain || filter.gain === "All" ||
-      (filter.gain === "Losing" && parseFloat(stock.realtime_chg_percent) < 0) ||
-      (filter.gain === "Gaining" && parseFloat(stock.realtime_chg_percent) >= 0));
-      const checkRangeFrom = stock => (!filter.range_from || parseFloat(stock.realtime_chg_percent) >= filter.range_from);
-      const checkRangeTo = stock => (!filter.range_to || parseFloat(stock.realtime_chg_percent) <= filter.range_to);
-      stocks = stocks.filter((stock) => { // TODO - 27/07/2017 -  checkStock func
-        return checkName(stock) && checkGain(stock) && checkRangeFrom(stock) && checkRangeTo(stock)
-      });
+      stocks = stocks.filter((stock) => checkStockByFilter(stock));
     }
 
     view.render(model.getUiState(), stocks);
@@ -77,14 +69,27 @@
 
   function toggleFilterAndRender() {
     model.setFilterEnabled(!model.getFilterEnabled());
+    if (model.getFilterEnabled() && model.getSettingsEnabled())  {
+      model.setSettingsEnabled(false);
+    }
     saveUiStateToLocalStorage();
     renderView();
   }
 
-  function toggleSettingsAndRender() { // TODO - 27/07/2017 -  settings or filter
+  function toggleSettingsAndRender() {
     model.setSettingsEnabled(!model.getSettingsEnabled());
+    if (model.getFilterEnabled() && model.getSettingsEnabled())  {
+      model.setFilterEnabled(false);
+    }
     saveUiStateToLocalStorage();
     renderView();
+  }
+
+  function arraySwap(array,firstIndex, secondIndex) {
+    const temp = array[secondIndex];
+    array[secondIndex] = array[firstIndex];
+    array[firstIndex] = temp;
+    return array;
   }
 
   function swapStocksOrder(currStockSymbol, shouldMoveUp) {
@@ -92,16 +97,11 @@
     const stocks = model.getStocks();
     const currLocation = stocksOrder.indexOf(currStockSymbol);
     const newLocation = shouldMoveUp ? currLocation - 1 : currLocation + 1;
-    if (newLocation >= 0 && newLocation < stocksOrder.length) { // TODO - 27/07/2017 -  inner swap
-      let temp = stocksOrder[newLocation];
-      stocksOrder[newLocation] = stocksOrder[currLocation];
-      stocksOrder[currLocation] = temp;
-      temp = stocks[newLocation];
-      stocks[newLocation] = stocks[currLocation];
-      stocks[currLocation] = temp;
+    if (newLocation >= 0 && newLocation < stocksOrder.length) {
+      model.setStocksOrder(arraySwap(stocksOrder, currLocation, newLocation));
+      model.setStocks(arraySwap(stocks, currLocation, newLocation));
     }
-    model.setStocksOrder(stocksOrder);
-    model.setStocks(stocks);
+
     saveUiStateToLocalStorage();
     renderView();
   }
@@ -123,8 +123,8 @@
     renderView();
   }
 
-  function searchAndRender(stockToSearch) { // TODO - 27/07/2017 -  move to api service
-    searchStocks(`http://localhost:7000/search?q=${stockToSearch}`) // TODO - 27/07/2017 -  es6 template strings
+  function searchAndRender(stockToSearch) {
+    apiService.searchStocks(stockToSearch)
       .then((res) => view.renderSearchResult(res, model.getStocksOrder()));
   }
 
@@ -132,8 +132,8 @@
     const stockOrder = model.getStocksOrder();
     stockOrder.push(symbol);
     model.setStocksOrder(stockOrder);
-    fetchStocks('http://localhost:7000/quotes?q=' + model.getStocksOrder())
-      .then((stocks) => { model.setStocks(stocks) });
+    apiService.fetchStocks((model.getStocksOrder()))
+      .then((stocks) => model.setStocks(stocks));
   }
 
   window.Stokr.Controller = {
